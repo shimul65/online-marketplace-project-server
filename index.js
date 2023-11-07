@@ -25,6 +25,13 @@ async function run() {
     try {
         // await client.connect();
 
+        const categoriesCollection = client.db('onlineMarketplaceDB').collection('categories');
+
+        app.get('/categories', async (req, res) => {
+            const result = await categoriesCollection.find().toArray();
+            res.send(result);
+        })
+
 
 
 
