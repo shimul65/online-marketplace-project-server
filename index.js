@@ -30,7 +30,11 @@ async function run() {
 
         // jobs related api
         app.get('/jobs', async (req, res) => {
-            const result = await jobsCollection.find().toArray();
+            let query = {};
+            if (req.query?.employerEmail) {
+                query = { employerEmail: req.query.employerEmail };
+            }
+            const result = await jobsCollection.find(query).toArray();
             res.send(result);
         })
 
@@ -47,6 +51,13 @@ async function run() {
             res.send(result);
         })
 
+        app.delete('/jobs/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await jobsCollection.deleteOne(query);
+            res.send(result);
+        })
+
 
 
 
@@ -56,8 +67,8 @@ async function run() {
         app.get('/bids', async (req, res) => {
 
             let query = {};
-            if (req.query?.email) {
-                query = { email: req.query.email };
+            if (req.query?.buyerEmail) {
+                query = { buyerEmail: req.query.buyerEmail };
             }
             const result = await bidsCollection.find(query).toArray();
             res.send(result);
