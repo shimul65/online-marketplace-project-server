@@ -45,6 +45,27 @@ async function run() {
             res.send(result);
         })
 
+
+        app.put('/jobs/:id', async (req, res) => {
+            const newJob = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateJob = {
+                $set: {
+                    jobTitle: newJob.jobTitle,
+                    deadline: newJob.deadline,
+                    categoryName: newJob.categoryName,
+                    minimumPrice: newJob.minimumPrice,
+                    maximumPrice: newJob.maximumPrice,
+                    employerEmail: newJob.employerEmail,
+                    description: newJob.description,
+                }
+            }
+            const result = await jobsCollection.updateOne(query, updateJob, options);
+            res.send(result);
+        })
+
         app.post('/jobs', async (req, res) => {
             const newJob = req.body;
             const result = await jobsCollection.insertOne(newJob);
