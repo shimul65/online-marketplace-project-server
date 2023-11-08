@@ -41,6 +41,12 @@ async function run() {
             res.send(result);
         })
 
+        app.post('/jobs', async (req, res) => {
+            const newJob = req.body;
+            const result = await jobsCollection.insertOne(newJob);
+            res.send(result);
+        })
+
 
 
 
@@ -49,11 +55,11 @@ async function run() {
 
         app.get('/bids', async (req, res) => {
 
-            // let query = {};
-            // if (req.query?.email) {
-            //     query = { email: req.query.email };
-            // }
-            const result = await bidsCollection.find().toArray();
+            let query = {};
+            if (req.query?.email) {
+                query = { email: req.query.email };
+            }
+            const result = await bidsCollection.find(query).toArray();
             res.send(result);
         })
 
