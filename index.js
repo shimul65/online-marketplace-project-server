@@ -66,6 +66,21 @@ async function run() {
             res.send(result);
         })
 
+        app.patch('/bids/:id', async (req, res) => {
+            const updateStatus = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateBids = {
+                $set: {
+                    bidStatus: updateStatus.bidStatus,
+                    bidRequestStatus: updateStatus.bidRequestStatus
+                }
+            }
+            const result = await bidsCollection.updateOne(query, updateBids, options);
+            res.send(result);
+        })
+
         app.post('/jobs', async (req, res) => {
             const newJob = req.body;
             const result = await jobsCollection.insertOne(newJob);
@@ -90,6 +105,9 @@ async function run() {
             let query = {};
             if (req.query?.buyerEmail) {
                 query = { buyerEmail: req.query.buyerEmail };
+            }
+            else if (req.query?.employerEmail) {
+                query = { employerEmail: req.query.employerEmail };
             }
             const result = await bidsCollection.find(query).toArray();
             res.send(result);
