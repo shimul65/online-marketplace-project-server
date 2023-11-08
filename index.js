@@ -66,20 +66,6 @@ async function run() {
             res.send(result);
         })
 
-        app.patch('/bids/:id', async (req, res) => {
-            const updateStatus = req.body;
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
-            const options = { upsert: true };
-            const updateBids = {
-                $set: {
-                    bidStatus: updateStatus.bidStatus,
-                    bidRequestStatus: updateStatus.bidRequestStatus
-                }
-            }
-            const result = await bidsCollection.updateOne(query, updateBids, options);
-            res.send(result);
-        })
 
         app.post('/jobs', async (req, res) => {
             const newJob = req.body;
@@ -109,7 +95,26 @@ async function run() {
             else if (req.query?.employerEmail) {
                 query = { employerEmail: req.query.employerEmail };
             }
-            const result = await bidsCollection.find(query).toArray();
+            const options = {
+                // Sort returned documents in ascending order by title (A->Z)
+                sort: { bidStatus: 1 }
+            };
+            const result = await bidsCollection.find(query, options).toArray();
+            res.send(result);
+        })
+
+        app.patch('/bids/:id', async (req, res) => {
+            const updateStatus = req.body;
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateBids = {
+                $set: {
+                    bidStatus: updateStatus.bidStatus,
+                    bidRequestStatus: updateStatus.bidRequestStatus
+                }
+            }
+            const result = await bidsCollection.updateOne(query, updateBids, options);
             res.send(result);
         })
 
