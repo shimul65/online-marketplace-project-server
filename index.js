@@ -26,7 +26,9 @@ async function run() {
         // await client.connect();
 
         const jobsCollection = client.db('onlineMarketplaceDB').collection('jobs');
+        const bidsCollection = client.db('onlineMarketplaceDB').collection('bids');
 
+        // jobs related api
         app.get('/jobs', async (req, res) => {
             const result = await jobsCollection.find().toArray();
             res.send(result);
@@ -38,6 +40,30 @@ async function run() {
             const result = await jobsCollection.findOne(query);
             res.send(result);
         })
+
+
+
+
+
+        //bids related api
+
+        app.get('/bids', async (req, res) => {
+
+            // let query = {};
+            // if (req.query?.email) {
+            //     query = { email: req.query.email };
+            // }
+            const result = await bidsCollection.find().toArray();
+            res.send(result);
+        })
+
+        app.post('/bids', async (req, res) => {
+            const bid = req.body;
+            const result = await bidsCollection.insertOne(bid);
+            res.send(result);
+        });
+
+
 
 
 
