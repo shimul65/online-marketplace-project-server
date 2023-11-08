@@ -25,10 +25,17 @@ async function run() {
     try {
         // await client.connect();
 
-        const categoriesCollection = client.db('onlineMarketplaceDB').collection('categories');
+        const jobsCollection = client.db('onlineMarketplaceDB').collection('jobs');
 
-        app.get('/categories', async (req, res) => {
-            const result = await categoriesCollection.find().toArray();
+        app.get('/jobs', async (req, res) => {
+            const result = await jobsCollection.find().toArray();
+            res.send(result);
+        })
+
+        app.get('/jobs/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await jobsCollection.findOne(query);
             res.send(result);
         })
 
