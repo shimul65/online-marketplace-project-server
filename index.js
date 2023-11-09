@@ -1,12 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5055;
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+    ],
+    credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 
 
@@ -27,6 +36,20 @@ async function run() {
 
         const jobsCollection = client.db('onlineMarketplaceDB').collection('jobs');
         const bidsCollection = client.db('onlineMarketplaceDB').collection('bids');
+
+        //auth api
+        app.post('/jwt', async (req, res) => {
+            const user = req.body
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h' })
+            res
+                .cookie('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production" ? true : false,
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+                })
+                .send({ success: true });
+        })
+
 
         // jobs related api
         app.get('/jobs', async (req, res) => {
