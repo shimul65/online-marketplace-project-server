@@ -12,6 +12,8 @@ const port = process.env.PORT || 5055;
 app.use(cors({
     origin: [
         'http://localhost:5173',
+        'https://online-marketplace-shimul.web.app',
+        'https://online-marketplace-shimul.firebaseapp.com'
     ],
     credentials: true
 }));
@@ -26,7 +28,6 @@ const verifyToken = async (req, res, next) => {
     if (!token) {
         return res.status(401).send({ message: 'unauthorized access' })
     }
-
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err) {
             console.log(err);
@@ -39,8 +40,6 @@ const verifyToken = async (req, res, next) => {
     })
 
 }
-
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.n45ephu.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -86,11 +85,7 @@ async function run() {
 
 
         // jobs related api
-        app.get('/jobs', verifyToken, async (req, res) => {
-
-            if (req.query.employerEmail !== req.user.email) {
-                return res.status(403).send({ message: 'forbidden access' })
-            }
+        app.get('/jobs', async (req, res) => {
 
             let query = {};
             if (req.query?.employerEmail) {
@@ -107,7 +102,6 @@ async function run() {
             const result = await jobsCollection.findOne(query);
             res.send(result);
         })
-
 
         app.put('/jobs/:id', async (req, res) => {
             const newJob = req.body;
@@ -143,9 +137,7 @@ async function run() {
             res.send(result);
         })
 
-
         //bids related api
-
         app.get('/bids', verifyToken, async (req, res) => {
 
             if (req.query?.buyerEmail !== req.user.email && req.query?.employerEmail !== req.user.email) {
@@ -186,7 +178,6 @@ async function run() {
             const result = await bidsCollection.insertOne(bid);
             res.send(result);
         });
-
 
 
         await client.db("admin").command({ ping: 1 });
