@@ -8,6 +8,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5055;
 
+// middleware
 app.use(cors({
     origin: [
         'http://localhost:5173',
@@ -44,6 +45,17 @@ async function run() {
             res
                 .cookie('token', token, {
                     httpOnly: true,
+                    secure: process.env.NODE_ENV === "production" ? true : false,
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+                })
+                .send({ success: true });
+        })
+
+        // clear coolie when user logged out
+        app.post('/logout', async (req, res) => {
+            res
+                .clearCookie('token', {
+                    maxAge: 0,
                     secure: process.env.NODE_ENV === "production" ? true : false,
                     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
                 })
@@ -104,9 +116,6 @@ async function run() {
         })
 
 
-
-
-
         //bids related api
 
         app.get('/bids', async (req, res) => {
@@ -149,22 +158,6 @@ async function run() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
@@ -172,31 +165,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
