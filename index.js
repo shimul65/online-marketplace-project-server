@@ -158,9 +158,9 @@ async function run() {
             res.send(result);
         })
 
-        app.patch('/bids/:id', async (req, res) => {
+        app.patch('/bids/:job_id', async (req, res) => {
             const updateStatus = req.body;
-            const id = req.params.id;
+            const id = req.params.job_id;
             const query = { _id: new ObjectId(id) };
             const options = { upsert: true };
             const updateBids = {
