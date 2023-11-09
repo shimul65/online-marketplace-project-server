@@ -18,6 +18,28 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// token verify middleware
+const verifyToken = async (req, res, next) => {
+
+    const token = req.cookies?.token;
+
+    if (!token) {
+        return res.status(401).send({ message: 'unauthorized access' })
+    }
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            console.log(err);
+            return res.status(401).send({ message: 'unauthorized ...' })
+        }
+        console.log('value in the token is :', decoded
+        );
+        req.user = decoded;
+        next();
+    })
+
+}
+
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.n45ephu.mongodb.net/?retryWrites=true&w=majority`;
@@ -64,11 +86,17 @@ async function run() {
 
 
         // jobs related api
-        app.get('/jobs', async (req, res) => {
+        app.get('/jobs', verifyToken, async (req, res) => {
+
+            if (req.query.employerEmail !== req.user.email) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+
             let query = {};
             if (req.query?.employerEmail) {
                 query = { employerEmail: req.query.employerEmail };
             }
+
             const result = await jobsCollection.find(query).toArray();
             res.send(result);
         })
@@ -118,8 +146,11 @@ async function run() {
 
         //bids related api
 
-        app.get('/bids', async (req, res) => {
+        app.get('/bids', verifyToken, async (req, res) => {
 
+            if (req.query?.buyerEmail !== req.user.email && req.query?.employerEmail !== req.user.email) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
             let query = {};
             if (req.query?.buyerEmail) {
                 query = { buyerEmail: req.query.buyerEmail };
