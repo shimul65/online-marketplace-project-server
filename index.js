@@ -11,9 +11,10 @@ const port = process.env.PORT || 5055;
 // middleware
 app.use(cors({
     origin: [
-        'http://localhost:5173',
+        'https://online-marketplace-assignment-shimul.surge.sh',
         'https://online-marketplace-shimul.web.app',
-        'https://online-marketplace-shimul.firebaseapp.com'
+        'https://online-marketplace-shimul.firebaseapp.com',
+        'http://localhost:5173',
     ],
     credentials: true
 }));
